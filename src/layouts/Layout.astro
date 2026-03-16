@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import CartIcon from '@/components/CartIcon';
+import { url } from '@/lib/utils';
 
 interface Props {
   title?: string;
@@ -17,19 +18,22 @@ const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
   <title>{title} | Pasta Panarese</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+  <script is:inline define:vars={{ baseUrl: import.meta.env.BASE_URL.replace(/\/?$/, '') }}>
+    window.__BASE_URL__ = baseUrl;
+  </script>
 </head>
 <body class="min-h-screen flex flex-col">
 
   <header class="bg-white border-b border-wheat-dark sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <a href="/" class="font-heading text-2xl font-bold text-brand">
+      <a href={url('/')} class="font-heading text-2xl font-bold text-brand">
         Pasta Panarese
       </a>
       <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
-        <a href="/prodotti" class="hover:text-brand transition-colors">Prodotti</a>
-        <a href="/categorie" class="hover:text-brand transition-colors">Categorie</a>
-        <a href="/chi-siamo" class="hover:text-brand transition-colors">Chi siamo</a>
+        <a href={url('/prodotti')} class="hover:text-brand transition-colors">Prodotti</a>
+        <a href={url('/categorie')} class="hover:text-brand transition-colors">Categorie</a>
+        <a href={url('/chi-siamo')} class="hover:text-brand transition-colors">Chi siamo</a>
       </nav>
       <div class="flex items-center gap-4">
         <CartIcon client:load />
@@ -42,9 +46,9 @@ const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'
     </div>
     <!-- Mobile menu -->
     <div id="mobile-menu" class="hidden md:hidden border-t border-wheat-dark bg-white px-4 py-4 space-y-3 text-sm font-medium">
-      <a href="/prodotti" class="block hover:text-brand transition-colors">Prodotti</a>
-      <a href="/categorie" class="block hover:text-brand transition-colors">Categorie</a>
-      <a href="/chi-siamo" class="block hover:text-brand transition-colors">Chi siamo</a>
+      <a href={url('/prodotti')} class="block hover:text-brand transition-colors">Prodotti</a>
+      <a href={url('/categorie')} class="block hover:text-brand transition-colors">Categorie</a>
+      <a href={url('/chi-siamo')} class="block hover:text-brand transition-colors">Chi siamo</a>
     </div>
   </header>
 
@@ -63,10 +67,10 @@ const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'
       <div>
         <h4 class="font-semibold mb-3">Navigazione</h4>
         <ul class="space-y-2 text-white/70 text-sm">
-          <li><a href="/prodotti" class="hover:text-white transition-colors">Prodotti</a></li>
-          <li><a href="/categorie" class="hover:text-white transition-colors">Categorie</a></li>
-          <li><a href="/chi-siamo" class="hover:text-white transition-colors">Chi siamo</a></li>
-          <li><a href="/carrello" class="hover:text-white transition-colors">Carrello</a></li>
+          <li><a href={url('/prodotti')} class="hover:text-white transition-colors">Prodotti</a></li>
+          <li><a href={url('/categorie')} class="hover:text-white transition-colors">Categorie</a></li>
+          <li><a href={url('/chi-siamo')} class="hover:text-white transition-colors">Chi siamo</a></li>
+          <li><a href={url('/carrello')} class="hover:text-white transition-colors">Carrello</a></li>
         </ul>
       </div>
       <div>

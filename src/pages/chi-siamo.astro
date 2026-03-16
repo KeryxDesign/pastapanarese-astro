@@ -1,5 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import { url } from '@/lib/utils';
 ---
 
 <Layout title="Chi siamo" description="La storia di Pasta Panarese, pasta artigianale dalla Val d'Orcia">
@@ -41,7 +42,7 @@ import Layout from '@/layouts/Layout.astro';
     </div>
 
     <div class="mt-16 text-center">
-      <a href="/prodotti" class="bg-brand text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-brand-dark transition-colors">
+      <a href={url('/prodotti')} class="bg-brand text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-brand-dark transition-colors">
         Scopri i prodotti
       </a>
     </div>

@@ -2,6 +2,7 @@
 import Layout from '@/layouts/Layout.astro';
 import { getProducts, getProductById, formatPrice } from '@/lib/woocommerce';
 import AddToCart from '@/components/AddToCart';
+import { url } from '@/lib/utils';
 
 export async function getStaticPaths() {
   const products = await getProducts({ per_page: 100 });
@@ -12,7 +13,7 @@ const { slug } = Astro.params;
 const products = await getProducts({ slug });
 const product = products[0];
 
-if (!product) return Astro.redirect('/prodotti');
+if (!product) return Astro.redirect(url('/prodotti'));
 
 // Fetch related products
 const relatedIds = [...(product.related_ids ?? []), ...(product.cross_sell_ids ?? [])].slice(0, 4);
@@ -33,9 +34,9 @@ function stripHtml(html: string) {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Breadcrumb -->
     <nav class="text-sm text-earth/70 mb-8 flex items-center gap-2">
-      <a href="/" class="hover:text-brand transition-colors">Home</a>
+      <a href={url('/')} class="hover:text-brand transition-colors">Home</a>
       <span>/</span>
-      <a href="/prodotti" class="hover:text-brand transition-colors">Prodotti</a>
+      <a href={url('/prodotti')} class="hover:text-brand transition-colors">Prodotti</a>
       <span>/</span>
       <span class="text-earth font-medium">{product.name}</span>
     </nav>
@@ -74,7 +75,7 @@ function stripHtml(html: string) {
         <!-- Categorie badge -->
         <div class="flex flex-wrap gap-2 mb-4">
           {product.categories.map((cat) => (
-            <a href={`/categorie/${cat.slug}`} class="text-xs font-semibold text-brand bg-wheat px-3 py-1 rounded-full hover:bg-wheat-dark transition-colors">
+            <a href={url(`/categorie/${cat.slug}`)} class="text-xs font-semibold text-brand bg-wheat px-3 py-1 rounded-full hover:bg-wheat-dark transition-colors">
               {cat.name}
             </a>
           ))}
@@ -151,7 +152,7 @@ function stripHtml(html: string) {
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
           {relatedProducts.map((rel) => rel && (
             <a
-              href={`/prodotti/${rel.slug}`}
+              href={url(`/prodotti/${rel.slug}`)}
               class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
               <div class="aspect-square overflow-hidden bg-wheat">

@@ -3,6 +3,7 @@ import { getItems, onCartChange, removeFromCart, updateQuantity } from '../store
 import type { CartItem } from '../stores/cart';
 
 export default function CartPage() {
+  const base = typeof window !== 'undefined' ? (window as any).__BASE_URL__ ?? '' : '';
   const [items, setItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
@@ -17,7 +18,7 @@ export default function CartPage() {
     return (
       <div className="text-center py-20">
         <p className="text-2xl font-heading mb-4">Il carrello è vuoto</p>
-        <a href="/prodotti" className="inline-block bg-brand text-white px-6 py-3 rounded-xl hover:bg-brand-dark transition-colors">
+        <a href={`${base}/prodotti`} className="inline-block bg-brand text-white px-6 py-3 rounded-xl hover:bg-brand-dark transition-colors">
           Vai ai prodotti
         </a>
       </div>
@@ -31,7 +32,7 @@ export default function CartPage() {
           <div key={item.id} className="flex items-center gap-4 bg-white rounded-card p-4 shadow-sm">
             <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
             <div className="flex-1">
-              <a href={`/prodotti/${item.slug}`} className="font-semibold hover:text-brand transition-colors">
+              <a href={`${base}/prodotti/${item.slug}`} className="font-semibold hover:text-brand transition-colors">
                 {item.name}
               </a>
               <p className="text-brand font-bold mt-1">{fmt(item.price)}</p>
@@ -61,7 +62,7 @@ export default function CartPage() {
           className="block w-full text-center bg-brand text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-dark transition-colors">
           Procedi all'acquisto
         </a>
-        <a href="/prodotti" className="block text-center text-sm text-gray-500 mt-3 hover:text-brand transition-colors">
+        <a href={`${base}/prodotti`} className="block text-center text-sm text-gray-500 mt-3 hover:text-brand transition-colors">
           ← Continua lo shopping
         </a>
       </div>

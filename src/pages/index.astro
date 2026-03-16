@@ -1,6 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { getProducts, getCategories, formatPrice } from '@/lib/woocommerce';
+import { url } from '@/lib/utils';
 
 const [products, categories] = await Promise.all([
   getProducts({ featured: 1, per_page: 8 }),
@@ -23,10 +24,10 @@ const mainCategories = categories.filter(c => c.slug !== 'uncategorized' && c.co
         La tradizione della pasta toscana direttamente a casa tua.
       </p>
       <div class="flex flex-wrap gap-4">
-        <a href="/prodotti" class="bg-brand hover:bg-brand-dark text-white px-8 py-4 rounded-xl font-semibold transition-colors">
+        <a href={url('/prodotti')} class="bg-brand hover:bg-brand-dark text-white px-8 py-4 rounded-xl font-semibold transition-colors">
           Scopri i prodotti
         </a>
-        <a href="/chi-siamo" class="border border-white/30 hover:border-white text-white px-8 py-4 rounded-xl font-semibold transition-colors">
+        <a href={url('/chi-siamo')} class="border border-white/30 hover:border-white text-white px-8 py-4 rounded-xl font-semibold transition-colors">
           La nostra storia
         </a>
       </div>
@@ -57,7 +58,7 @@ const mainCategories = categories.filter(c => c.slug !== 'uncategorized' && c.co
       <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
         {mainCategories.map((cat) => (
           <a
-            href={`/categorie/${cat.slug}`}
+            href={url(`/categorie/${cat.slug}`)}
             class="group relative rounded-2xl overflow-hidden bg-wheat aspect-[4/3] flex items-end hover:shadow-lg transition-shadow"
           >
             {cat.image && (
@@ -82,12 +83,12 @@ const mainCategories = categories.filter(c => c.slug !== 'uncategorized' && c.co
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div class="flex items-center justify-between mb-12">
         <h2 class="font-heading text-4xl font-bold">In evidenza</h2>
-        <a href="/prodotti" class="text-brand font-semibold hover:underline text-sm">Vedi tutti →</a>
+        <a href={url('/prodotti')} class="text-brand font-semibold hover:underline text-sm">Vedi tutti →</a>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         {products.map((product) => (
           <a
-            href={`/prodotti/${product.slug}`}
+            href={url(`/prodotti/${product.slug}`)}
             class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
           >
             <div class="aspect-square overflow-hidden bg-wheat">
@@ -128,7 +129,7 @@ const mainCategories = categories.filter(c => c.slug !== 'uncategorized' && c.co
       <p class="text-white/80 mb-8 text-lg">
         Risparmia acquistando le nostre confezioni da 8 pacchi. Stessa qualità, prezzo conveniente.
       </p>
-      <a href="/prodotti" class="bg-white text-brand px-8 py-4 rounded-xl font-bold hover:bg-wheat transition-colors">
+      <a href={url('/prodotti')} class="bg-white text-brand px-8 py-4 rounded-xl font-bold hover:bg-wheat transition-colors">
         Scopri i pacchi risparmio
       </a>
     </div>

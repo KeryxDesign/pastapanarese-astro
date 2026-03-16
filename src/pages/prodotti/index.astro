@@ -1,6 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { getProducts, getCategories, formatPrice } from '@/lib/woocommerce';
+import { url } from '@/lib/utils';
 
 const allProducts = await getProducts({ per_page: 100 });
 const categories = await getCategories({ hide_empty: 1 });
@@ -20,14 +21,14 @@ const filtered = selectedCat
     <!-- Filtri categoria -->
     <div class="flex flex-wrap gap-2 mb-10">
       <a
-        href="/prodotti"
+        href={url('/prodotti')}
         class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${!selectedCat ? 'bg-brand text-white border-brand' : 'border-wheat-dark hover:border-brand hover:text-brand'}`}
       >
         Tutti
       </a>
       {mainCats.map((cat) => (
         <a
-          href={`/prodotti?categoria=${cat.slug}`}
+          href={url(`/prodotti?categoria=${cat.slug}`)}
           class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${selectedCat === cat.slug ? 'bg-brand text-white border-brand' : 'border-wheat-dark hover:border-brand hover:text-brand'}`}
         >
           {cat.name}
@@ -42,7 +43,7 @@ const filtered = selectedCat
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filtered.map((product) => (
           <a
-            href={`/prodotti/${product.slug}`}
+            href={url(`/prodotti/${product.slug}`)}
             class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
           >
             <div class="aspect-square overflow-hidden bg-wheat">

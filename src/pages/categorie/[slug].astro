@@ -1,6 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { getCategories, getProducts, formatPrice } from '@/lib/woocommerce';
+import { url } from '@/lib/utils';
 
 export async function getStaticPaths() {
   const categories = await getCategories({ hide_empty: 1 });
@@ -13,7 +14,7 @@ const { slug } = Astro.params;
 const cats = await getCategories({ slug });
 const category = cats[0];
 
-if (!category) return Astro.redirect('/categorie');
+if (!category) return Astro.redirect(url('/categorie'));
 
 const products = await getProducts({ category: category.id, per_page: 100 });
 ---
@@ -23,9 +24,9 @@ const products = await getProducts({ category: category.id, per_page: 100 });
     <!-- Header categoria -->
     <div class="mb-10">
       <nav class="text-sm text-gray-500 mb-4 flex items-center gap-2">
-        <a href="/" class="hover:text-brand transition-colors">Home</a>
+        <a href={url('/')} class="hover:text-brand transition-colors">Home</a>
         <span>/</span>
-        <a href="/categorie" class="hover:text-brand transition-colors">Categorie</a>
+        <a href={url('/categorie')} class="hover:text-brand transition-colors">Categorie</a>
         <span>/</span>
         <span class="text-earth font-medium">{category.name}</span>
       </nav>
@@ -52,13 +53,13 @@ const products = await getProducts({ category: category.id, per_page: 100 });
     {products.length === 0 ? (
       <div class="text-center py-20 text-gray-500">
         <p class="text-xl mb-4">Nessun prodotto in questa categoria.</p>
-        <a href="/prodotti" class="text-brand hover:underline">Vedi tutti i prodotti →</a>
+        <a href={url('/prodotti')} class="text-brand hover:underline">Vedi tutti i prodotti →</a>
       </div>
     ) : (
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <a
-            href={`/prodotti/${product.slug}`}
+            href={url(`/prodotti/${product.slug}`)}
             class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
           >
             <div class="aspect-square overflow-hidden bg-wheat">

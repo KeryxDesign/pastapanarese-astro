@@ -8,6 +8,8 @@ import path from 'path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  site: 'https://keryxdesign.github.io',
+  base: '/pastapanarese-astro',
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
