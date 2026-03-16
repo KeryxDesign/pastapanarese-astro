@@ -1,0 +1,11 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import CartDrawer from '@/components/CartDrawer';
+---
+
+<Layout title="Carrello">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="font-heading text-5xl font-bold mb-10">Carrello</h1>
+    <CartDrawer client:load />
+  </div>
+</Layout>

@@ -1,0 +1,91 @@
+---
+import '../styles/global.css';
+import CartIcon from '@/components/CartIcon';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'Orcia' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title} | Pasta Panarese</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <header class="bg-white border-b border-wheat-dark sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="font-heading text-2xl font-bold text-brand">
+        Pasta Panarese
+      </a>
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="/prodotti" class="hover:text-brand transition-colors">Prodotti</a>
+        <a href="/categorie" class="hover:text-brand transition-colors">Categorie</a>
+        <a href="/chi-siamo" class="hover:text-brand transition-colors">Chi siamo</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <CartIcon client:load />
+        <button id="menu-btn" class="md:hidden p-2" aria-label="Menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-wheat-dark bg-white px-4 py-4 space-y-3 text-sm font-medium">
+      <a href="/prodotti" class="block hover:text-brand transition-colors">Prodotti</a>
+      <a href="/categorie" class="block hover:text-brand transition-colors">Categorie</a>
+      <a href="/chi-siamo" class="block hover:text-brand transition-colors">Chi siamo</a>
+    </div>
+  </header>
+
+  <main class="flex-1">
+    <slot />
+  </main>
+
+  <footer class="bg-earth text-white mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="font-heading text-xl mb-3">Pasta Panarese</h3>
+        <p class="text-white/70 text-sm leading-relaxed">
+          Pasta artigianale dalla Val d'Orcia, fatta con grano 100% italiano e lavorata secondo tradizione.
+        </p>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-3">Navigazione</h4>
+        <ul class="space-y-2 text-white/70 text-sm">
+          <li><a href="/prodotti" class="hover:text-white transition-colors">Prodotti</a></li>
+          <li><a href="/categorie" class="hover:text-white transition-colors">Categorie</a></li>
+          <li><a href="/chi-siamo" class="hover:text-white transition-colors">Chi siamo</a></li>
+          <li><a href="/carrello" class="hover:text-white transition-colors">Carrello</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-3">Contatti</h4>
+        <ul class="space-y-2 text-white/70 text-sm">
+          <li>info@pastapanarese.it</li>
+          <li><a href="https://pastapanarese.it" target="_blank" class="hover:text-white transition-colors">pastapanarese.it</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 py-4 text-center text-white/60 text-xs">
+      © {new Date().getFullYear()} Pasta Panarese. Tutti i diritti riservati.
+    </div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+  </script>
+</body>
+</html>

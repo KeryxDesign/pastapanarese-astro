@@ -1,0 +1,36 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getCategories } from '@/lib/woocommerce';
+
+const categories = await getCategories({ hide_empty: 1 });
+const mainCats = categories.filter(c => c.slug !== 'uncategorized' && c.parent === 0 && c.count > 0);
+---
+
+<Layout title="Categorie" description="Tutte le categorie di pasta Panarese">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="font-heading text-5xl font-bold mb-10">Categorie</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {mainCats.map((cat) => (
+        <a
+          href={`/categorie/${cat.slug}`}
+          class="group relative rounded-2xl overflow-hidden bg-wheat aspect-[16/9] flex items-end hover:shadow-xl transition-shadow"
+        >
+          {cat.image && (
+            <img
+              src={cat.image.src}
+              alt={cat.image.alt || cat.name}
+              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          )}
+          <div class="relative z-10 w-full bg-gradient-to-t from-black/80 to-transparent p-6">
+            <h2 class="font-heading text-white font-bold text-2xl">{cat.name}</h2>
+            {cat.description && (
+              <p class="text-white/70 text-sm mt-1 line-clamp-2" set:html={cat.description} />
+            )}
+            <p class="text-white/60 text-xs mt-2">{cat.count} prodotti</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,95 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getCategories, getProducts, formatPrice } from '@/lib/woocommerce';
+
+export async function getStaticPaths() {
+  const categories = await getCategories({ hide_empty: 1 });
+  return categories
+    .filter(c => c.slug !== 'uncategorized')
+    .map((c) => ({ params: { slug: c.slug } }));
+}
+
+const { slug } = Astro.params;
+const cats = await getCategories({ slug });
+const category = cats[0];
+
+if (!category) return Astro.redirect('/categorie');
+
+const products = await getProducts({ category: category.id, per_page: 100 });
+---
+
+<Layout title={category.name} description={`Prodotti della categoria ${category.name}`}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Header categoria -->
+    <div class="mb-10">
+      <nav class="text-sm text-gray-500 mb-4 flex items-center gap-2">
+        <a href="/" class="hover:text-brand transition-colors">Home</a>
+        <span>/</span>
+        <a href="/categorie" class="hover:text-brand transition-colors">Categorie</a>
+        <span>/</span>
+        <span class="text-earth font-medium">{category.name}</span>
+      </nav>
+
+      <div class="flex items-start gap-6">
+        {category.image && (
+          <img
+            src={category.image.src}
+            alt={category.image.alt || category.name}
+            class="w-24 h-24 rounded-xl object-cover hidden md:block"
+          />
+        )}
+        <div>
+          <h1 class="font-heading text-5xl font-bold mb-2">{category.name}</h1>
+          {category.description && (
+            <p class="text-gray-600 max-w-2xl" set:html={category.description} />
+          )}
+          <p class="text-sm text-gray-500 mt-2">{products.length} prodotti</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Griglia prodotti -->
+    {products.length === 0 ? (
+      <div class="text-center py-20 text-gray-500">
+        <p class="text-xl mb-4">Nessun prodotto in questa categoria.</p>
+        <a href="/prodotti" class="text-brand hover:underline">Vedi tutti i prodotti →</a>
+      </div>
+    ) : (
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <a
+            href={`/prodotti/${product.slug}`}
+            class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div class="aspect-square overflow-hidden bg-wheat">
+              {product.images[0] ? (
+                <img
+                  src={product.images[0].src}
+                  alt={product.images[0].alt || product.name}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center text-5xl">🍝</div>
+              )}
+            </div>
+            <div class="p-4">
+              {product.on_sale && (
+                <span class="inline-block bg-brand text-white text-xs font-bold px-2 py-0.5 rounded mb-2">OFFERTA</span>
+              )}
+              <h3 class="font-semibold text-sm leading-tight mb-2 group-hover:text-brand transition-colors line-clamp-2">
+                {product.name}
+              </h3>
+              <div class="flex items-center gap-2">
+                <span class="text-brand font-bold">{formatPrice(product.price)}</span>
+                {product.on_sale && product.regular_price && (
+                  <span class="text-gray-500 line-through text-xs">{formatPrice(product.regular_price)}</span>
+                )}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>

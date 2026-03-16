@@ -1,0 +1,79 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getProducts, getCategories, formatPrice } from '@/lib/woocommerce';
+
+const allProducts = await getProducts({ per_page: 100 });
+const categories = await getCategories({ hide_empty: 1 });
+
+const mainCats = categories.filter(c => c.slug !== 'uncategorized' && c.count > 0);
+
+const selectedCat = Astro.url.searchParams.get('categoria') ?? '';
+const filtered = selectedCat
+  ? allProducts.filter(p => p.categories.some(c => c.slug === selectedCat))
+  : allProducts;
+---
+
+<Layout title="Prodotti" description="Tutti i prodotti Pasta Panarese">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="font-heading text-5xl font-bold mb-10">Prodotti</h1>
+
+    <!-- Filtri categoria -->
+    <div class="flex flex-wrap gap-2 mb-10">
+      <a
+        href="/prodotti"
+        class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${!selectedCat ? 'bg-brand text-white border-brand' : 'border-wheat-dark hover:border-brand hover:text-brand'}`}
+      >
+        Tutti
+      </a>
+      {mainCats.map((cat) => (
+        <a
+          href={`/prodotti?categoria=${cat.slug}`}
+          class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${selectedCat === cat.slug ? 'bg-brand text-white border-brand' : 'border-wheat-dark hover:border-brand hover:text-brand'}`}
+        >
+          {cat.name}
+        </a>
+      ))}
+    </div>
+
+    <!-- Griglia prodotti -->
+    {filtered.length === 0 ? (
+      <p class="text-gray-500 text-center py-20">Nessun prodotto trovato.</p>
+    ) : (
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {filtered.map((product) => (
+          <a
+            href={`/prodotti/${product.slug}`}
+            class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div class="aspect-square overflow-hidden bg-wheat">
+              {product.images[0] ? (
+                <img
+                  src={product.images[0].src}
+                  alt={product.images[0].alt || product.name}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center text-5xl">🍝</div>
+              )}
+            </div>
+            <div class="p-4">
+              {product.on_sale && (
+                <span class="inline-block bg-brand text-white text-xs font-bold px-2 py-0.5 rounded mb-2">OFFERTA</span>
+              )}
+              <h3 class="font-semibold text-sm leading-tight mb-2 group-hover:text-brand transition-colors line-clamp-2">
+                {product.name}
+              </h3>
+              <div class="flex items-center gap-2">
+                <span class="text-brand font-bold">{formatPrice(product.price)}</span>
+                {product.on_sale && product.regular_price && (
+                  <span class="text-gray-500 line-through text-xs">{formatPrice(product.regular_price)}</span>
+                )}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>
