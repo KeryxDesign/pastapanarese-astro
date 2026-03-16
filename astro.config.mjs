@@ -16,9 +16,6 @@ export default defineConfig({
     resolve: {
       alias: { '@': path.resolve(__dirname, './src') },
     },
-    optimizeDeps: {
-      include: ['nanostores', '@nanostores/react'],
-    },
   },
   server: {
     port: 4329,
