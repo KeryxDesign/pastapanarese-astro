@@ -36,7 +36,7 @@ const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'
         <a href={url('/chi-siamo')} class="hover:text-brand transition-colors">Chi siamo</a>
       </nav>
       <div class="flex items-center gap-4">
-        <CartIcon client:load />
+        <CartIcon client:load base={import.meta.env.BASE_URL.replace(/\/?$/, '')} />
         <button id="menu-btn" class="md:hidden p-2" aria-label="Menu">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>

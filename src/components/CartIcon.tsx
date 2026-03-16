@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getItems, onCartChange } from '../stores/cart';
 
-export default function CartIcon() {
-  const base = typeof window !== 'undefined' ? (window as any).__BASE_URL__ ?? '' : '';
+export default function CartIcon({ base = '' }: { base?: string }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {

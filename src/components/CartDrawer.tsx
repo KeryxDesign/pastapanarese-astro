@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { getItems, onCartChange, removeFromCart, updateQuantity } from '../stores/cart';
 import type { CartItem } from '../stores/cart';
 
-export default function CartPage() {
-  const base = typeof window !== 'undefined' ? (window as any).__BASE_URL__ ?? '' : '';
+export default function CartPage({ base = '' }: { base?: string }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
@@ -58,7 +57,8 @@ export default function CartPage() {
           <span>Totale</span>
           <span className="text-brand">{fmt(total)}</span>
         </div>
-        <a href="https://pastapanarese.it/carrello/"
+        <a
+          href={`https://pastapanarese.it/?pp_fill_cart=${btoa(JSON.stringify(items.map(i => ({ id: i.id, qty: i.quantity }))))}`}
           className="block w-full text-center bg-brand text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-dark transition-colors">
           Procedi all'acquisto
         </a>
