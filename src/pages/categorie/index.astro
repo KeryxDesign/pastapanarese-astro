@@ -9,12 +9,12 @@ const mainCats = categories.filter(c => c.slug !== 'uncategorized' && c.parent =
 
 <Layout title="Categorie" description="Tutte le categorie di pasta Panarese">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="font-heading text-5xl font-bold mb-10">Categorie</h1>
+    <h1 class="font-heading text-5xl font-bold text-earth mb-10">Categorie</h1>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {mainCats.map((cat) => (
         <a
           href={url(`/categorie/${cat.slug}`)}
-          class="group relative rounded-2xl overflow-hidden bg-wheat aspect-[16/9] flex items-end hover:shadow-xl transition-shadow"
+          class="group relative rounded-2xl overflow-hidden bg-cream aspect-[16/9] flex items-end hover:shadow-xl transition-shadow"
         >
           {cat.image && (
             <img

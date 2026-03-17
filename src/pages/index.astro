@@ -9,128 +9,158 @@ const [products, categories] = await Promise.all([
 ]);
 
 const mainCategories = categories.filter(c => c.slug !== 'uncategorized' && c.count > 0).slice(0, 6);
+
+const heroCategories = [
+  {
+    name: 'Pasta Corta',
+    slug: 'pasta-corta',
+    image: 'https://pastapanarese.it/wp-content/uploads/2024/10/pasta-corta-cat.jpg',
+  },
+  {
+    name: 'Pasta Lunga',
+    slug: 'pasta-lunga',
+    image: 'https://pastapanarese.it/wp-content/uploads/2024/10/pasta-lunga-cat.jpg',
+  },
+  {
+    name: "Pasta all'Uovo",
+    slug: 'pasta-alluovo',
+    image: 'https://pastapanarese.it/wp-content/uploads/2024/10/pasta-uovo-cat.jpg',
+  },
+];
 ---
 
 <Layout title="Home">
   <!-- Hero -->
-  <section class="relative bg-earth text-white overflow-hidden min-h-[70vh] flex items-center">
-    <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36">
-      <p class="text-wheat text-sm font-semibold uppercase tracking-widest mb-4">Val d'Orcia · Toscana</p>
-      <h1 class="font-heading text-5xl md:text-7xl font-bold leading-tight mb-6">
-        Pasta artigianale<br />come una volta
-      </h1>
-      <p class="text-white/80 text-lg max-w-xl mb-10 leading-relaxed">
-        Grano 100% italiano, trafilata al bronzo, essiccata lentamente.
-        La tradizione della pasta toscana direttamente a casa tua.
+  <section class="relative min-h-[80vh] flex items-center overflow-hidden">
+    <img
+      src="https://pastapanarese.it/wp-content/uploads/2024/10/home2.jpg"
+      alt="Pasta Panarese - Val d'Orcia"
+      class="absolute inset-0 w-full h-full object-cover"
+    />
+    <div class="absolute inset-0 bg-[rgba(61,61,61,0.65)]"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36 text-center">
+      <p class="text-amber text-sm font-semibold uppercase tracking-[0.25em] mb-4">
+        Coltivatori di Pasta
       </p>
-      <div class="flex flex-wrap gap-4">
-        <a href={url('/prodotti')} class="bg-brand hover:bg-brand-dark text-white px-8 py-4 rounded-xl font-semibold transition-colors">
-          Scopri i prodotti
-        </a>
-        <a href={url('/chi-siamo')} class="border border-white/30 hover:border-white text-white px-8 py-4 rounded-xl font-semibold transition-colors">
-          La nostra storia
-        </a>
-      </div>
+      <h1 class="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
+        Filiera cortissima<br />entro 10 km dallo stabilimento
+      </h1>
+      <p class="text-white/80 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+        Grano 100% italiano, trafilato al bronzo, essiccato lentamente.
+        La tradizione della pasta toscana dalla Val d'Orcia a casa tua.
+      </p>
+      <a
+        href={url('/prodotti')}
+        class="inline-block bg-amber hover:bg-amber/90 text-brown-dark px-10 py-4 rounded-xl font-bold text-lg transition-colors"
+      >
+        Scopri i prodotti
+      </a>
     </div>
   </section>
 
-  <!-- Valori brand -->
-  <section class="bg-wheat py-12">
+  <!-- Brand values -->
+  <section class="bg-brown py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
       {[
-        { icon: '🌾', label: 'Grano 100% italiano' },
-        { icon: '🏺', label: 'Trafilata al bronzo' },
-        { icon: '🤲', label: 'Lavorazione artigianale' },
-        { icon: '🚚', label: 'Spedizione in 24h' },
-      ].map(({ icon, label }) => (
+        'Filiera Corta',
+        'Trafilatura al Bronzo',
+        'Essiccazione Lenta',
+        'Grano 100% Italiano',
+      ].map((label) => (
         <div class="flex flex-col items-center gap-2">
-          <span class="text-3xl">{icon}</span>
-          <span class="text-sm font-semibold text-earth">{label}</span>
+          <span class="text-amber text-sm font-bold uppercase tracking-wider">{label}</span>
         </div>
       ))}
     </div>
   </section>
 
-  <!-- Categorie -->
-  {mainCategories.length > 0 && (
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <h2 class="font-heading text-4xl font-bold text-center mb-12">Le nostre linee</h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-        {mainCategories.map((cat) => (
-          <a
-            href={url(`/categorie/${cat.slug}`)}
-            class="group relative rounded-2xl overflow-hidden bg-wheat aspect-[4/3] flex items-end hover:shadow-lg transition-shadow"
-          >
-            {cat.image && (
-              <img
-                src={cat.image.src}
-                alt={cat.image.alt || cat.name}
-                class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            )}
-            <div class="relative z-10 w-full bg-gradient-to-t from-black/70 to-transparent p-4">
-              <h3 class="font-heading text-white font-bold text-lg">{cat.name}</h3>
-              <p class="text-white/70 text-sm">{cat.count} prodotti</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    </section>
-  )}
+  <!-- Categorie in evidenza (3 colonne con immagini) -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <h2 class="font-heading text-4xl font-bold text-center text-earth mb-12">Le nostre linee</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {heroCategories.map((cat) => (
+        <a
+          href={url(`/categorie/${cat.slug}`)}
+          class="group relative rounded-2xl overflow-hidden aspect-[3/4] flex items-end hover:shadow-xl transition-shadow"
+        >
+          <img
+            src={cat.image}
+            alt={cat.name}
+            class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <div class="relative z-10 w-full bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6">
+            <h3 class="font-heading text-white font-bold text-2xl">{cat.name}</h3>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
 
   <!-- Prodotti in evidenza -->
   {products.length > 0 && (
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div class="flex items-center justify-between mb-12">
-        <h2 class="font-heading text-4xl font-bold">In evidenza</h2>
-        <a href={url('/prodotti')} class="text-brand font-semibold hover:underline text-sm">Vedi tutti →</a>
-      </div>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <a
-            href={url(`/prodotti/${product.slug}`)}
-            class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div class="aspect-square overflow-hidden bg-wheat">
-              {product.images[0] ? (
-                <img
-                  src={product.images[0].src}
-                  alt={product.images[0].alt || product.name}
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div class="w-full h-full flex items-center justify-center text-4xl">🍝</div>
-              )}
-            </div>
-            <div class="p-4">
-              {product.on_sale && (
-                <span class="inline-block bg-brand text-white text-xs font-bold px-2 py-0.5 rounded mb-2">OFFERTA</span>
-              )}
-              <h3 class="font-semibold text-sm leading-tight mb-2 group-hover:text-brand transition-colors">
-                {product.name}
-              </h3>
-              <div class="flex items-center gap-2">
-                <span class="text-brand font-bold">{formatPrice(product.price)}</span>
-                {product.on_sale && product.regular_price && (
-                  <span class="text-gray-500 line-through text-xs">{formatPrice(product.regular_price)}</span>
+    <section class="bg-cream py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-12">
+          <h2 class="font-heading text-4xl font-bold text-earth">In evidenza</h2>
+          <a href={url('/prodotti')} class="text-amber font-semibold hover:underline text-sm">
+            Vedi tutti &rarr;
+          </a>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <a
+              href={url(`/prodotti/${product.slug}`)}
+              class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="aspect-square overflow-hidden bg-cream">
+                {product.images[0] ? (
+                  <img
+                    src={product.images[0].src}
+                    alt={product.images[0].alt || product.name}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center text-muted text-4xl">
+                    Pasta
+                  </div>
                 )}
               </div>
-            </div>
-          </a>
-        ))}
+              <div class="p-4">
+                {product.on_sale && (
+                  <span class="inline-block bg-amber text-brown text-xs font-bold px-2 py-0.5 rounded mb-2">
+                    OFFERTA
+                  </span>
+                )}
+                <h3 class="font-semibold text-sm text-earth leading-tight mb-2 group-hover:text-amber transition-colors">
+                  {product.name}
+                </h3>
+                <div class="flex items-center gap-2">
+                  <span class="text-amber font-bold">{formatPrice(product.price)}</span>
+                  {product.on_sale && product.regular_price && (
+                    <span class="text-gray-500 line-through text-xs">{formatPrice(product.regular_price)}</span>
+                  )}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   )}
 
-  <!-- CTA finale -->
-  <section class="bg-brand text-white py-20 text-center">
-    <div class="max-w-2xl mx-auto px-4">
-      <h2 class="font-heading text-4xl font-bold mb-4">Pacchi risparmio</h2>
-      <p class="text-white/80 mb-8 text-lg">
-        Risparmia acquistando le nostre confezioni da 8 pacchi. Stessa qualità, prezzo conveniente.
+  <!-- CTA band -->
+  <section class="bg-amber py-16 text-center">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="font-heading text-4xl font-bold text-brown mb-4">Scopri i nostri pacchi risparmio</h2>
+      <p class="text-brown/80 mb-8 text-lg">
+        Risparmia acquistando le nostre confezioni da 8 pacchi. Stessa qualita artigianale, prezzo conveniente.
       </p>
-      <a href={url('/prodotti')} class="bg-white text-brand px-8 py-4 rounded-xl font-bold hover:bg-wheat transition-colors">
-        Scopri i pacchi risparmio
+      <a
+        href={url('/prodotti')}
+        class="inline-block bg-brown hover:bg-brown-dark text-white px-10 py-4 rounded-xl font-bold transition-colors"
+      >
+        Vedi i pacchi risparmio
       </a>
     </div>
   </section>

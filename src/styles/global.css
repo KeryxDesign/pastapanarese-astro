@@ -1,27 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Jost', Helvetica, Arial, sans-serif;
+  --font-body: 'Inter', Helvetica, Arial, sans-serif;
 
-  --color-brand: #8B2315;
-  --color-brand-dark: #6B1A0F;
-  --color-brand-light: #C9452F;
-  --color-wheat: #F5E6C8;
-  --color-wheat-dark: #E8D4A8;
-  --color-earth: #4A3728;
-  --color-cream: #FAF7F2;
+  --color-amber: #F5B335;
+  --color-amber-light: #F9CA6B;
+  --color-amber-dark: #D99B1F;
+  --color-brown: #6F4C1D;
+  --color-brown-dark: #523712;
+  --color-brown-light: #8B6530;
+  --color-earth: #333333;
+  --color-muted: #666666;
+  --color-light: #939393;
+  --color-cream: #FAFAFA;
+  --color-warm: #F8F8F8;
 
-  --radius-card: 0.75rem;
+  --radius-card: 0.5rem;
 }
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-cream);
+  background-color: #ffffff;
   color: var(--color-earth);
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }

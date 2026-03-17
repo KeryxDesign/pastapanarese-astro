@@ -24,20 +24,20 @@ export default function AddToCart({ id, name, price, image, slug }: Props) {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setQty(Math.max(1, qty - 1))}
-          className="w-9 h-9 rounded-full border border-wheat-dark flex items-center justify-center hover:bg-wheat transition-colors text-lg font-bold"
+          className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors text-lg font-bold"
         >−</button>
         <span className="w-8 text-center font-semibold text-lg">{qty}</span>
         <button
           onClick={() => setQty(qty + 1)}
-          className="w-9 h-9 rounded-full border border-wheat-dark flex items-center justify-center hover:bg-wheat transition-colors text-lg font-bold"
+          className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors text-lg font-bold"
         >+</button>
       </div>
       <button
         onClick={handleAdd}
-        className={`w-full py-3 px-6 rounded-xl font-semibold text-white transition-all duration-200 ${
+        className={`w-full py-3 px-6 rounded-xl font-semibold text-brown transition-all duration-200 ${
           added
             ? 'bg-green-600'
-            : 'bg-brand hover:bg-brand-dark active:scale-95'
+            : 'bg-amber hover:bg-brown-dark active:scale-95'
         }`}
       >
         {added ? '✓ Aggiunto al carrello' : 'Aggiungi al carrello'}

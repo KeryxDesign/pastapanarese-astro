@@ -8,7 +8,17 @@ interface Props {
   description?: string;
 }
 
-const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'Orcia' } = Astro.props;
+const { title = 'Pasta Panarese', description = 'Pasta Panarese: Eccellenza della Pasta Italiana dalla Val d\'Orcia' } = Astro.props;
+
+const navLinks = [
+  { href: '/prodotti', label: 'Shop' },
+  { href: '/filosofia', label: 'Filosofia' },
+  { href: '/pastificio', label: 'Pastificio' },
+  { href: '/qualita', label: 'Qualita Panarese' },
+  { href: '/val-dorcia', label: "La Val d'Orcia" },
+  { href: '/eroica', label: "Panarese x l'Eroica" },
+  { href: '/contatti', label: 'Contatti' },
+];
 ---
 
 <!DOCTYPE html>
@@ -17,38 +27,65 @@ const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
-  <title>{title} | Pasta Panarese</title>
-  <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+  <title>{title} | Pasta Panarese - Coltivatori di Pasta</title>
+  <link rel="icon" type="image/png" href="https://pastapanarese.it/wp-content/uploads/2024/02/logo-circulardef.png" />
   <script is:inline define:vars={{ baseUrl: import.meta.env.BASE_URL.replace(/\/?$/, '') }}>
     window.__BASE_URL__ = baseUrl;
   </script>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-white">
 
-  <header class="bg-white border-b border-wheat-dark sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <a href={url('/')} class="font-heading text-2xl font-bold text-brand">
-        Pasta Panarese
+  <!-- Top bar -->
+  <div class="bg-white border-b border-gray-100 text-sm hidden md:block">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex justify-between items-center text-brown">
+      <span class="text-light text-xs">Coltivatori di Pasta dalla Val d'Orcia</span>
+      <div class="flex items-center gap-4 text-xs">
+        <a href="mailto:info@pastapanarese.it" class="hover:text-amber transition-colors">info@pastapanarese.it</a>
+        <a href={url('/carrello')} class="hover:text-amber transition-colors">Il mio account</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header principale -->
+  <header class="bg-amber sticky top-0 z-50 shadow-sm" id="main-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo -->
+      <a href={url('/')} class="flex items-center gap-3 shrink-0">
+        <img
+          src="https://pastapanarese.it/wp-content/uploads/2024/02/logo-circulardef.png"
+          alt="Pasta Panarese"
+          class="w-12 h-12 rounded-full"
+        />
+        <span class="font-heading text-xl font-bold text-brown hidden sm:block">Pasta Panarese</span>
       </a>
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
-        <a href={url('/prodotti')} class="hover:text-brand transition-colors">Prodotti</a>
-        <a href={url('/categorie')} class="hover:text-brand transition-colors">Categorie</a>
-        <a href={url('/chi-siamo')} class="hover:text-brand transition-colors">Chi siamo</a>
+
+      <!-- Nav desktop -->
+      <nav class="hidden lg:flex items-center gap-6 text-sm font-medium">
+        {navLinks.map(({ href, label }) => (
+          <a href={url(href)} class="text-brown hover:text-brown-dark transition-colors font-heading font-semibold tracking-wide">
+            {label}
+          </a>
+        ))}
       </nav>
-      <div class="flex items-center gap-4">
+
+      <!-- Cart + Mobile menu -->
+      <div class="flex items-center gap-3">
         <CartIcon client:load base={import.meta.env.BASE_URL.replace(/\/?$/, '')} />
-        <button id="menu-btn" class="md:hidden p-2" aria-label="Menu">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="menu-btn" class="lg:hidden p-2 text-brown hover:text-brown-dark" aria-label="Menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
       </div>
     </div>
+
     <!-- Mobile menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-wheat-dark bg-white px-4 py-4 space-y-3 text-sm font-medium">
-      <a href={url('/prodotti')} class="block hover:text-brand transition-colors">Prodotti</a>
-      <a href={url('/categorie')} class="block hover:text-brand transition-colors">Categorie</a>
-      <a href={url('/chi-siamo')} class="block hover:text-brand transition-colors">Chi siamo</a>
+    <div id="mobile-menu" class="hidden lg:hidden bg-amber border-t border-amber-dark px-4 py-4 space-y-3">
+      {navLinks.map(({ href, label }) => (
+        <a href={url(href)} class="block text-brown font-heading font-semibold hover:text-brown-dark transition-colors py-1">
+          {label}
+        </a>
+      ))}
     </div>
   </header>
 
@@ -56,33 +93,67 @@ const { title = 'Pasta Panarese', description = 'Pasta artigianale della Val d\'
     <slot />
   </main>
 
-  <footer class="bg-earth text-white mt-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+  <!-- Footer -->
+  <footer class="bg-brown text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <!-- Brand -->
       <div>
-        <h3 class="font-heading text-xl mb-3">Pasta Panarese</h3>
+        <div class="flex items-center gap-3 mb-4">
+          <img src="https://pastapanarese.it/wp-content/uploads/2024/02/logo-circulardef.png" alt="Pasta Panarese" class="w-14 h-14 rounded-full" />
+          <div>
+            <h3 class="font-heading text-amber text-xl font-bold">Pasta Panarese</h3>
+            <p class="text-white/60 text-xs">Coltivatori di Pasta</p>
+          </div>
+        </div>
         <p class="text-white/70 text-sm leading-relaxed">
-          Pasta artigianale dalla Val d'Orcia, fatta con grano 100% italiano e lavorata secondo tradizione.
+          Pasta artigianale dalla Val d'Orcia, fatta con grano 100% italiano coltivato entro 10 km dal pastificio.
         </p>
       </div>
+
+      <!-- Nav -->
       <div>
-        <h4 class="font-semibold mb-3">Navigazione</h4>
+        <h4 class="font-heading font-bold text-amber mb-4">Esplora</h4>
         <ul class="space-y-2 text-white/70 text-sm">
-          <li><a href={url('/prodotti')} class="hover:text-white transition-colors">Prodotti</a></li>
-          <li><a href={url('/categorie')} class="hover:text-white transition-colors">Categorie</a></li>
-          <li><a href={url('/chi-siamo')} class="hover:text-white transition-colors">Chi siamo</a></li>
-          <li><a href={url('/carrello')} class="hover:text-white transition-colors">Carrello</a></li>
+          <li><a href={url('/prodotti')} class="hover:text-amber transition-colors">Shop</a></li>
+          <li><a href={url('/filosofia')} class="hover:text-amber transition-colors">Filosofia</a></li>
+          <li><a href={url('/pastificio')} class="hover:text-amber transition-colors">Pastificio</a></li>
+          <li><a href={url('/qualita')} class="hover:text-amber transition-colors">Qualita Panarese</a></li>
+          <li><a href={url('/eroica')} class="hover:text-amber transition-colors">Panarese x l'Eroica</a></li>
         </ul>
       </div>
+
+      <!-- Categorie -->
       <div>
-        <h4 class="font-semibold mb-3">Contatti</h4>
+        <h4 class="font-heading font-bold text-amber mb-4">Prodotti</h4>
         <ul class="space-y-2 text-white/70 text-sm">
-          <li>info@pastapanarese.it</li>
-          <li><a href="https://pastapanarese.it" target="_blank" class="hover:text-white transition-colors">pastapanarese.it</a></li>
+          <li><a href={url('/prodotti?categoria=pastacorta')} class="hover:text-amber transition-colors">Pasta Corta</a></li>
+          <li><a href={url('/prodotti?categoria=pastalunga')} class="hover:text-amber transition-colors">Pasta Lunga</a></li>
+          <li><a href={url('/prodotti?categoria=pastaalluovo')} class="hover:text-amber transition-colors">Pasta all'Uovo</a></li>
+          <li><a href={url('/prodotti?categoria=sughi')} class="hover:text-amber transition-colors">Sughi</a></li>
+          <li><a href={url('/prodotti?categoria=pacchi-risparmio-pasta')} class="hover:text-amber transition-colors">Pacchi Risparmio</a></li>
         </ul>
+      </div>
+
+      <!-- Info -->
+      <div>
+        <h4 class="font-heading font-bold text-amber mb-4">Informazioni</h4>
+        <ul class="space-y-2 text-white/70 text-sm">
+          <li><a href={url('/contatti')} class="hover:text-amber transition-colors">Contatti</a></li>
+          <li><a href={url('/pagamenti-e-spedizioni')} class="hover:text-amber transition-colors">Pagamenti e Spedizioni</a></li>
+          <li><a href={url('/condizioni-di-vendita')} class="hover:text-amber transition-colors">Condizioni di Vendita</a></li>
+          <li><a href={url('/privacy')} class="hover:text-amber transition-colors">Privacy Policy</a></li>
+          <li><a href={url('/certificazione-ifs')} class="hover:text-amber transition-colors">Certificazione IFS</a></li>
+        </ul>
+        <div class="mt-4 text-white/60 text-xs space-y-1">
+          <p>Soc. Agr. Pasta Panarese</p>
+          <p>Via del Colombaio snc</p>
+          <p>Castiglione d'Orcia (SI)</p>
+          <p><a href="mailto:info@pastapanarese.it" class="hover:text-amber transition-colors">info@pastapanarese.it</a></p>
+        </div>
       </div>
     </div>
-    <div class="border-t border-white/10 py-4 text-center text-white/60 text-xs">
-      © {new Date().getFullYear()} Pasta Panarese. Tutti i diritti riservati.
+    <div class="border-t border-white/10 py-4 text-center text-white/40 text-xs">
+      &copy; {new Date().getFullYear()} Soc. Agr. Pasta Panarese. Tutti i diritti riservati.
     </div>
   </footer>
 

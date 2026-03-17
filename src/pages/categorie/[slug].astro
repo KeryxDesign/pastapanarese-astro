@@ -23,10 +23,10 @@ const products = await getProducts({ category: category.id, per_page: 100 });
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Header categoria -->
     <div class="mb-10">
-      <nav class="text-sm text-gray-500 mb-4 flex items-center gap-2">
-        <a href={url('/')} class="hover:text-brand transition-colors">Home</a>
+      <nav class="text-sm text-muted mb-4 flex items-center gap-2">
+        <a href={url('/')} class="hover:text-amber transition-colors">Home</a>
         <span>/</span>
-        <a href={url('/categorie')} class="hover:text-brand transition-colors">Categorie</a>
+        <a href={url('/categorie')} class="hover:text-amber transition-colors">Categorie</a>
         <span>/</span>
         <span class="text-earth font-medium">{category.name}</span>
       </nav>
@@ -40,20 +40,20 @@ const products = await getProducts({ category: category.id, per_page: 100 });
           />
         )}
         <div>
-          <h1 class="font-heading text-5xl font-bold mb-2">{category.name}</h1>
+          <h1 class="font-heading text-5xl font-bold text-earth mb-2">{category.name}</h1>
           {category.description && (
-            <p class="text-gray-600 max-w-2xl" set:html={category.description} />
+            <p class="text-muted max-w-2xl" set:html={category.description} />
           )}
-          <p class="text-sm text-gray-500 mt-2">{products.length} prodotti</p>
+          <p class="text-sm text-muted mt-2">{products.length} prodotti</p>
         </div>
       </div>
     </div>
 
     <!-- Griglia prodotti -->
     {products.length === 0 ? (
-      <div class="text-center py-20 text-gray-500">
+      <div class="text-center py-20 text-muted">
         <p class="text-xl mb-4">Nessun prodotto in questa categoria.</p>
-        <a href={url('/prodotti')} class="text-brand hover:underline">Vedi tutti i prodotti →</a>
+        <a href={url('/prodotti')} class="text-amber hover:underline">Vedi tutti i prodotti &rarr;</a>
       </div>
     ) : (
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -62,7 +62,7 @@ const products = await getProducts({ category: category.id, per_page: 100 });
             href={url(`/prodotti/${product.slug}`)}
             class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
           >
-            <div class="aspect-square overflow-hidden bg-wheat">
+            <div class="aspect-square overflow-hidden bg-cream">
               {product.images[0] ? (
                 <img
                   src={product.images[0].src}
@@ -71,18 +71,22 @@ const products = await getProducts({ category: category.id, per_page: 100 });
                   loading="lazy"
                 />
               ) : (
-                <div class="w-full h-full flex items-center justify-center text-5xl">🍝</div>
+                <div class="w-full h-full flex items-center justify-center text-muted text-5xl">
+                  Pasta
+                </div>
               )}
             </div>
             <div class="p-4">
               {product.on_sale && (
-                <span class="inline-block bg-brand text-white text-xs font-bold px-2 py-0.5 rounded mb-2">OFFERTA</span>
+                <span class="inline-block bg-amber text-brown text-xs font-bold px-2 py-0.5 rounded mb-2">
+                  OFFERTA
+                </span>
               )}
-              <h3 class="font-semibold text-sm leading-tight mb-2 group-hover:text-brand transition-colors line-clamp-2">
+              <h3 class="font-semibold text-sm text-earth leading-tight mb-2 group-hover:text-amber transition-colors line-clamp-2">
                 {product.name}
               </h3>
               <div class="flex items-center gap-2">
-                <span class="text-brand font-bold">{formatPrice(product.price)}</span>
+                <span class="text-amber font-bold">{formatPrice(product.price)}</span>
                 {product.on_sale && product.regular_price && (
                   <span class="text-gray-500 line-through text-xs">{formatPrice(product.regular_price)}</span>
                 )}

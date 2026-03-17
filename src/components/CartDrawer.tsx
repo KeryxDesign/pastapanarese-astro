@@ -17,7 +17,7 @@ export default function CartPage({ base = '' }: { base?: string }) {
     return (
       <div className="text-center py-20">
         <p className="text-2xl font-heading mb-4">Il carrello è vuoto</p>
-        <a href={`${base}/prodotti`} className="inline-block bg-brand text-white px-6 py-3 rounded-xl hover:bg-brand-dark transition-colors">
+        <a href={`${base}/prodotti`} className="inline-block bg-amber text-brown px-6 py-3 rounded-xl hover:bg-brown-dark transition-colors">
           Vai ai prodotti
         </a>
       </div>
@@ -31,17 +31,17 @@ export default function CartPage({ base = '' }: { base?: string }) {
           <div key={item.id} className="flex items-center gap-4 bg-white rounded-card p-4 shadow-sm">
             <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
             <div className="flex-1">
-              <a href={`${base}/prodotti/${item.slug}`} className="font-semibold hover:text-brand transition-colors">
+              <a href={`${base}/prodotti/${item.slug}`} className="font-semibold hover:text-amber transition-colors">
                 {item.name}
               </a>
-              <p className="text-brand font-bold mt-1">{fmt(item.price)}</p>
+              <p className="text-amber font-bold mt-1">{fmt(item.price)}</p>
             </div>
             <div className="flex items-center gap-2">
               <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                className="w-8 h-8 rounded-full border flex items-center justify-center hover:bg-wheat transition-colors">−</button>
+                className="w-8 h-8 rounded-full border flex items-center justify-center hover:bg-gray-100 transition-colors">−</button>
               <span className="w-6 text-center font-semibold">{item.quantity}</span>
               <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                className="w-8 h-8 rounded-full border flex items-center justify-center hover:bg-wheat transition-colors">+</button>
+                className="w-8 h-8 rounded-full border flex items-center justify-center hover:bg-gray-100 transition-colors">+</button>
             </div>
             <button onClick={() => removeFromCart(item.id)}
               className="text-gray-400 hover:text-red-500 transition-colors ml-2" aria-label="Rimuovi">
@@ -55,14 +55,14 @@ export default function CartPage({ base = '' }: { base?: string }) {
       <div className="bg-white rounded-card p-6 shadow-sm">
         <div className="flex justify-between items-center text-xl font-bold mb-6">
           <span>Totale</span>
-          <span className="text-brand">{fmt(total)}</span>
+          <span className="text-amber">{fmt(total)}</span>
         </div>
         <a
           href={`https://pastapanarese.it/?pp_fill_cart=${btoa(JSON.stringify(items.map(i => ({ id: i.id, qty: i.quantity }))))}`}
-          className="block w-full text-center bg-brand text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-dark transition-colors">
+          className="block w-full text-center bg-amber text-brown py-4 rounded-xl font-bold text-lg hover:bg-brown-dark transition-colors">
           Procedi all'acquisto
         </a>
-        <a href={`${base}/prodotti`} className="block text-center text-sm text-gray-500 mt-3 hover:text-brand transition-colors">
+        <a href={`${base}/prodotti`} className="block text-center text-sm text-gray-500 mt-3 hover:text-amber transition-colors">
           ← Continua lo shopping
         </a>
       </div>
