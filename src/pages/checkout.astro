@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CheckoutForm from '../components/CheckoutForm.tsx';
+
+const base = import.meta.env.BASE_URL?.replace(/\/?$/, '') ?? '';
+---
+
+<Layout title="Checkout — Pasta Panarese">
+  <main class="min-h-screen bg-cream">
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b border-gray-100">
+      <div class="max-w-6xl mx-auto px-4 py-3">
+        <nav class="flex items-center gap-2 text-sm text-muted">
+          <a href={`${base}/`} class="hover:text-amber transition-colors">Home</a>
+          <span>/</span>
+          <a href={`${base}/carrello`} class="hover:text-amber transition-colors">Carrello</a>
+          <span>/</span>
+          <span class="text-brown font-medium">Checkout</span>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="bg-white border-b border-gray-100">
+      <div class="max-w-2xl mx-auto px-4 py-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber text-brown rounded-full flex items-center justify-center text-sm font-bold">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-brown">Carrello</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-amber mx-3"></div>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-amber text-brown rounded-full flex items-center justify-center text-sm font-bold">2</div>
+            <span class="text-sm font-medium text-brown">Dati</span>
+          </div>
+          <div class="flex-1 h-0.5 bg-gray-200 mx-3"></div>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-gray-200 text-muted rounded-full flex items-center justify-center text-sm font-bold">3</div>
+            <span class="text-sm text-muted">Pagamento</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Form -->
+    <div class="max-w-6xl mx-auto px-4 py-8 md:py-12">
+      <h1 class="text-3xl md:text-4xl font-heading font-bold text-brown mb-8">Checkout</h1>
+      <CheckoutForm client:load base={base} />
+    </div>
+  </main>
+</Layout>

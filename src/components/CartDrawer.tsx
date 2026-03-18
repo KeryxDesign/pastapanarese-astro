@@ -58,9 +58,9 @@ export default function CartPage({ base = '' }: { base?: string }) {
           <span className="text-amber">{fmt(total)}</span>
         </div>
         <a
-          href={`https://pastapanarese.it/?pp_fill_cart=${btoa(JSON.stringify(items.map(i => ({ id: i.id, qty: i.quantity }))))}`}
-          className="block w-full text-center bg-amber text-brown py-4 rounded-xl font-bold text-lg hover:bg-brown-dark transition-colors">
-          Procedi all'acquisto
+          href={`${base}/checkout`}
+          className="block w-full text-center bg-amber text-brown py-4 rounded-xl font-bold text-lg hover:bg-amber-dark transition-colors">
+          Procedi al checkout
         </a>
         <a href={`${base}/prodotti`} className="block text-center text-sm text-gray-500 mt-3 hover:text-amber transition-colors">
           ← Continua lo shopping
