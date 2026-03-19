@@ -58,7 +58,7 @@ export default function CartPage({ base = '' }: { base?: string }) {
           <span className="text-amber">{fmt(total)}</span>
         </div>
         <a
-          href={`${base}/checkout`}
+          href="https://pastapanarese.it/checkout/"
           className="block w-full text-center bg-amber text-brown py-4 rounded-xl font-bold text-lg hover:bg-amber-dark transition-colors">
           Procedi al checkout
         </a>
