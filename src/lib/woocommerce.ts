@@ -1,4 +1,4 @@
-const BASE = import.meta.env.WC_URL;
+const BASE = import.meta.env.WC_URL || 'https://pastapanarese.it';
 const KEY = import.meta.env.WC_KEY;
 const SECRET = import.meta.env.WC_SECRET;
 
