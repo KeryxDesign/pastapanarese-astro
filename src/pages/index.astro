@@ -6,27 +6,19 @@ import { url } from '@/lib/utils';
 const allProducts = await getProducts({ per_page: 100 });
 const categories = await getCategories({ hide_empty: 1 });
 
-// Separate root categories from sub-categories
 const rootCats = categories.filter(c => c.parent === 0 && c.slug !== 'uncategorized' && c.count > 0);
 const bundleSubCats = categories.filter(c => c.parent > 0 && c.count > 0);
 
-// Category groups for display
 const pastaCats = rootCats.filter(c => ['pastacorta', 'pastalunga', 'pastaalluovo', 'pasta-senatore-cappelli'].includes(c.slug));
 const otherCats = rootCats.filter(c => ['sughi', 'promo'].includes(c.slug));
 const bundleCat = rootCats.find(c => c.slug === 'bundle');
 
-const selectedCat = Astro.url.searchParams.get('categoria') ?? '';
-const filtered = selectedCat
-  ? allProducts.filter(p => p.categories.some(c => c.slug === selectedCat))
-  : allProducts;
-
-// Separate single products from bundles for default view
-const singleProducts = allProducts.filter(p => !p.categories.some(c => c.slug === 'bundle'));
-const bundleProducts = allProducts.filter(p => p.categories.some(c => c.slug === 'bundle'));
-
-const displayProducts = selectedCat
-  ? filtered
-  : singleProducts; // Default: show singles, not bundles
+// Pre-compute category slugs for each product as data attribute
+const productsData = allProducts.map(p => ({
+  ...p,
+  catSlugs: p.categories.map(c => c.slug),
+  isBundle: p.categories.some(c => c.slug === 'bundle'),
+}));
 ---
 
 <Layout title="Shop" description="Pasta Panarese: pasta artigianale dalla Val d'Orcia. Shop online.">
@@ -35,104 +27,158 @@ const displayProducts = selectedCat
 
     <!-- Filtri categoria -->
     <div class="space-y-3 mb-10">
-      <!-- Riga principale -->
       <div class="flex flex-wrap gap-2">
-        <a
-          href={url('/')}
-          class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${!selectedCat ? 'bg-amber text-brown border-amber' : 'border-gray-200 hover:border-amber hover:text-amber'}`}
+        <button
+          data-filter=""
+          class="filter-btn active px-4 py-2 rounded-full text-sm font-semibold border transition-colors bg-amber text-brown border-amber"
         >
           Tutti
-        </a>
+        </button>
         {pastaCats.map((cat) => (
-          <a
-            href={url(`/?categoria=${cat.slug}`)}
-            class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${selectedCat === cat.slug ? 'bg-amber text-brown border-amber' : 'border-gray-200 hover:border-amber hover:text-amber'}`}
+          <button
+            data-filter={cat.slug}
+            class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border transition-colors border-gray-200 hover:border-amber hover:text-amber"
           >
             {cat.name}
-          </a>
+          </button>
         ))}
         {otherCats.map((cat) => (
-          <a
-            href={url(`/?categoria=${cat.slug}`)}
-            class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${selectedCat === cat.slug ? 'bg-amber text-brown border-amber' : 'border-gray-200 hover:border-amber hover:text-amber'}`}
+          <button
+            data-filter={cat.slug}
+            class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border transition-colors border-gray-200 hover:border-amber hover:text-amber"
           >
             {cat.name}
-          </a>
+          </button>
         ))}
       </div>
 
-      <!-- Pacchi risparmio -->
       <div class="flex flex-wrap gap-2">
         {bundleCat && (
-          <a
-            href={url(`/?categoria=bundle`)}
-            class={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${selectedCat === 'bundle' ? 'bg-brown text-white border-brown' : 'border-brown/30 text-brown hover:border-brown hover:bg-brown/5'}`}
+          <button
+            data-filter="bundle"
+            class="filter-btn px-4 py-2 rounded-full text-sm font-semibold border transition-colors border-brown/30 text-brown hover:border-brown hover:bg-brown/5"
           >
             🎁 Tutti i Pacchi Risparmio
-          </a>
+          </button>
         )}
         {bundleSubCats.map((cat) => (
-          <a
-            href={url(`/?categoria=${cat.slug}`)}
-            class={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${selectedCat === cat.slug ? 'bg-brown text-white border-brown' : 'border-brown/20 text-brown/70 hover:border-brown hover:text-brown'}`}
+          <button
+            data-filter={cat.slug}
+            class="filter-btn px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors border-brown/20 text-brown/70 hover:border-brown hover:text-brown"
           >
             {cat.name}
-          </a>
+          </button>
         ))}
       </div>
     </div>
 
     <!-- Griglia prodotti -->
-    {displayProducts.length === 0 ? (
-      <p class="text-muted text-center py-20">Nessun prodotto trovato.</p>
-    ) : (
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {displayProducts.map((product) => (
-          <a
-            href={url(`/prodotti/${product.slug}`)}
-            class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div class="aspect-square overflow-hidden bg-cream relative">
-              {product.images[0] ? (
-                <img
-                  src={product.images[0].src}
-                  alt={product.images[0].alt || product.name}
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-              ) : (
-                <div class="w-full h-full flex items-center justify-center text-muted text-5xl">
-                  Pasta
-                </div>
-              )}
-              {product.categories.some(c => c.slug === 'bundle') && (
-                <span class="absolute top-2 left-2 bg-brown text-white text-xs font-bold px-2 py-1 rounded">
-                  PACCO RISPARMIO
-                </span>
-              )}
-            </div>
-            <div class="p-4">
-              {product.on_sale && (
-                <span class="inline-block bg-amber text-brown text-xs font-bold px-2 py-0.5 rounded mb-2">
-                  OFFERTA
-                </span>
-              )}
-              <h3 class="font-semibold text-sm text-earth leading-tight mb-2 group-hover:text-amber transition-colors line-clamp-2">
-                {product.name}
-              </h3>
-              <div class="flex items-center gap-2">
-                <span class="text-amber font-bold">{formatPrice(product.price)}</span>
-                {product.on_sale && product.regular_price && (
-                  <span class="text-gray-500 line-through text-xs">{formatPrice(product.regular_price)}</span>
-                )}
+    <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {productsData.map((product) => (
+        <a
+          href={url(`/prodotti/${product.slug}`)}
+          class="product-card group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+          data-categories={product.catSlugs.join(',')}
+          data-is-bundle={product.isBundle ? 'true' : 'false'}
+        >
+          <div class="aspect-square overflow-hidden bg-cream relative">
+            {product.images[0] ? (
+              <img
+                src={product.images[0].src}
+                alt={product.images[0].alt || product.name}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+            ) : (
+              <div class="w-full h-full flex items-center justify-center text-muted text-5xl">
+                Pasta
               </div>
-              {product.upsell_ids?.length > 0 && !product.categories.some(c => c.slug === 'bundle') && (
-                <p class="text-xs text-brown/60 mt-1">Disponibile anche in pacco risparmio</p>
+            )}
+            {product.isBundle && (
+              <span class="absolute top-2 left-2 bg-brown text-white text-xs font-bold px-2 py-1 rounded">
+                PACCO RISPARMIO
+              </span>
+            )}
+          </div>
+          <div class="p-4">
+            {product.on_sale && (
+              <span class="inline-block bg-amber text-brown text-xs font-bold px-2 py-0.5 rounded mb-2">
+                OFFERTA
+              </span>
+            )}
+            <h3 class="font-semibold text-sm text-earth leading-tight mb-2 group-hover:text-amber transition-colors line-clamp-2">
+              {product.name}
+            </h3>
+            <div class="flex items-center gap-2">
+              <span class="text-amber font-bold">{formatPrice(product.price)}</span>
+              {product.on_sale && product.regular_price && (
+                <span class="text-gray-500 line-through text-xs">{formatPrice(product.regular_price)}</span>
               )}
             </div>
-          </a>
-        ))}
-      </div>
-    )}
+            {product.upsell_ids?.length > 0 && !product.isBundle && (
+              <p class="text-xs text-brown/60 mt-1">Disponibile anche in pacco risparmio</p>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <p id="no-results" class="text-muted text-center py-20 hidden">Nessun prodotto trovato.</p>
   </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.product-card');
+    const noResults = document.getElementById('no-results');
+
+    function applyFilter(filter: string) {
+      const isBundleFilter = filter === 'bundle' || filter.startsWith('bundle-');
+
+      let visibleCount = 0;
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const cats = el.dataset.categories?.split(',') || [];
+        const isBundleProduct = el.dataset.isBundle === 'true';
+
+        let show = false;
+        if (!filter) {
+          show = !isBundleProduct;
+        } else if (isBundleFilter) {
+          show = cats.includes(filter);
+        } else {
+          show = cats.includes(filter) && !isBundleProduct;
+        }
+
+        el.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+
+      if (noResults) noResults.classList.toggle('hidden', visibleCount > 0);
+    }
+
+    // Init: hide bundles on load
+    applyFilter('');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = (btn as HTMLElement).dataset.filter || '';
+
+        buttons.forEach(b => {
+          const el = b as HTMLElement;
+          el.classList.remove('active', 'bg-amber', 'text-brown', 'border-amber', 'bg-brown', 'text-white', 'border-brown');
+          el.classList.add('border-gray-200');
+        });
+
+        const isBundleFilter = filter === 'bundle' || filter.startsWith('bundle-');
+        if (isBundleFilter) {
+          (btn as HTMLElement).classList.add('active', 'bg-brown', 'text-white', 'border-brown');
+        } else {
+          (btn as HTMLElement).classList.add('active', 'bg-amber', 'text-brown', 'border-amber');
+        }
+        (btn as HTMLElement).classList.remove('border-gray-200');
+
+        applyFilter(filter);
+      });
+    });
+  </script>
 </Layout>

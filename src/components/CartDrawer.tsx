@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getItems, onCartChange, removeFromCart, updateQuantity } from '../stores/cart';
+import { getItems, onCartChange, removeFromCart, updateQuantity, clearCart } from '../stores/cart';
 import type { CartItem } from '../stores/cart';
 
 const PROVINCES = [
@@ -16,25 +16,30 @@ const PROVINCES = [
 interface BillingData {
   first_name: string; last_name: string; email: string; phone: string;
   address_1: string; city: string; postcode: string; state: string;
-  company: string; codice_fiscale: string;
+  company: string; codice_fiscale: string; piva: string;
 }
+
+const WC_URL = 'https://www.pastapanarese.it';
+const WC_KEY = 'ck_aa88b6215b311a08b1e017d1d7f1a26d0efa0fff';
+const WC_SECRET = 'cs_10e6fd6be90ca5464a241ad9377b52135c3d1651';
 
 export default function CartDrawer({ base = '' }: { base?: string }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<'cart' | 'checkout' | 'processing'>('cart');
+  const [view, setView] = useState<'cart' | 'checkout' | 'processing' | 'error'>('cart');
   const [errorMsg, setErrorMsg] = useState('');
+  const [customerType, setCustomerType] = useState<'private' | 'business'>('private');
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [notes, setNotes] = useState('');
 
   const [billing, setBilling] = useState<BillingData>({
     first_name: '', last_name: '', email: '', phone: '',
     address_1: '', city: '', postcode: '', state: '',
-    company: '', codice_fiscale: ''
+    company: '', codice_fiscale: '', piva: ''
   });
   const [shipping, setShipping] = useState({
     first_name: '', last_name: '', address_1: '', city: '',
-    postcode: '', state: '', country: 'IT'
+    postcode: '', state: ''
   });
 
   useEffect(() => {
@@ -55,13 +60,17 @@ export default function CartDrawer({ base = '' }: { base?: string }) {
   const updateBilling = (f: keyof BillingData, v: string) => setBilling(p => ({ ...p, [f]: v }));
   const updateShipping = (f: string, v: string) => setShipping(p => ({ ...p, [f]: v }));
 
-  const close = () => { setOpen(false); setTimeout(() => setView('cart'), 300); };
+  const close = () => { setOpen(false); setTimeout(() => { if (view !== 'processing') setView('cart'); }, 300); };
 
   const validate = (): string | null => {
     if (!billing.first_name.trim()) return 'Inserisci il nome';
     if (!billing.last_name.trim()) return 'Inserisci il cognome';
     if (!billing.email.trim() || !billing.email.includes('@')) return "Inserisci un'email valida";
     if (!billing.phone.trim()) return 'Inserisci il telefono';
+    if (customerType === 'business') {
+      if (!billing.company.trim()) return 'Inserisci la ragione sociale';
+      if (!billing.piva.trim()) return 'Inserisci la Partita IVA';
+    }
     if (!billing.address_1.trim()) return "Inserisci l'indirizzo";
     if (!billing.city.trim()) return 'Inserisci la città';
     if (!billing.postcode.trim() || billing.postcode.length !== 5) return 'CAP non valido (5 cifre)';
@@ -74,25 +83,68 @@ export default function CartDrawer({ base = '' }: { base?: string }) {
     return null;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const err = validate();
     if (err) { setErrorMsg(err); return; }
     setErrorMsg('');
     setView('processing');
 
+    const shippingData = shipToDifferent
+      ? { ...shipping, country: 'IT' }
+      : { first_name: billing.first_name, last_name: billing.last_name, address_1: billing.address_1, city: billing.city, postcode: billing.postcode, state: billing.state, country: 'IT' };
+
+    const billingMeta: { key: string; value: string }[] = [];
+    if (billing.codice_fiscale) billingMeta.push({ key: 'billing_codice_fiscale', value: billing.codice_fiscale });
+    if (billing.piva) billingMeta.push({ key: 'billing_piva', value: billing.piva });
+
     const orderData = {
-      billing: { ...billing, country: 'IT' },
-      shipping: shipToDifferent
-        ? { ...shipping, country: 'IT' }
-        : { first_name: billing.first_name, last_name: billing.last_name, address_1: billing.address_1, city: billing.city, postcode: billing.postcode, state: billing.state, country: 'IT' },
+      payment_method: '',
+      payment_method_title: '',
+      set_paid: false,
+      billing: {
+        first_name: billing.first_name,
+        last_name: billing.last_name,
+        email: billing.email,
+        phone: billing.phone,
+        address_1: billing.address_1,
+        city: billing.city,
+        postcode: billing.postcode,
+        state: billing.state,
+        country: 'IT',
+        company: billing.company,
+      },
+      shipping: shippingData,
       line_items: items.map(i => ({ product_id: i.id, quantity: i.quantity })),
       customer_note: notes,
+      meta_data: billingMeta,
     };
 
-    const json = JSON.stringify(orderData);
-    const payload = btoa(unescape(encodeURIComponent(json)));
-    window.location.href = 'https://pastapanarese.it/?pp_checkout=' + payload;
+    try {
+      const res = await fetch(`${WC_URL}/wp-json/wc/v3/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + btoa(`${WC_KEY}:${WC_SECRET}`),
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Errore ${res.status}`);
+      }
+
+      const order = await res.json();
+
+      // Redirect to WooCommerce payment page
+      clearCart();
+      window.location.href = order.payment_url || `${WC_URL}/checkout/order-pay/${order.id}/?pay_for_order=true&key=${order.order_key}`;
+
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Errore nella creazione dell\'ordine. Riprova.');
+      setView('checkout');
+    }
   };
 
   const ic = "w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber/50 focus:border-amber transition-colors text-earth text-sm";
@@ -108,7 +160,7 @@ export default function CartDrawer({ base = '' }: { base?: string }) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
             <h2 className="font-heading text-lg font-bold text-earth">
-              {view === 'cart' ? <>Carrello {count > 0 && <span className="text-amber">({count})</span>}</> : 'Checkout'}
+              {view === 'cart' ? <>Carrello {count > 0 && <span className="text-amber">({count})</span>}</> : view === 'checkout' ? 'Checkout' : 'Elaborazione...'}
             </h2>
             <div className="flex items-center gap-2">
               {view === 'checkout' && (
@@ -184,9 +236,53 @@ export default function CartDrawer({ base = '' }: { base?: string }) {
                   </div>
                 </div>
 
+                {/* Customer type toggle */}
+                <div>
+                  <p className="text-sm font-medium text-brown mb-2">Acquisto come:</p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCustomerType('private')}
+                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold border-2 transition-colors ${
+                        customerType === 'private'
+                          ? 'border-amber bg-amber/10 text-brown'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      Privato
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCustomerType('business')}
+                      className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold border-2 transition-colors ${
+                        customerType === 'business'
+                          ? 'border-amber bg-amber/10 text-brown'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      Azienda / P.IVA
+                    </button>
+                  </div>
+                </div>
+
                 {/* Billing */}
                 <div>
                   <h3 className="font-heading font-bold text-brown mb-3">Dati di fatturazione</h3>
+
+                  {customerType === 'business' && (
+                    <>
+                      <div className="mb-3"><label className={lc}>Ragione Sociale *</label><input type="text" value={billing.company} onChange={e => updateBilling('company', e.target.value)} className={ic} placeholder="Es. Ristorante Da Mario Srl" required /></div>
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div><label className={lc}>Partita IVA *</label><input type="text" value={billing.piva} onChange={e => updateBilling('piva', e.target.value)} className={ic} placeholder="IT01234567890" required /></div>
+                        <div><label className={lc}>Codice Fiscale</label><input type="text" value={billing.codice_fiscale} onChange={e => updateBilling('codice_fiscale', e.target.value)} className={ic} placeholder="Opzionale" /></div>
+                      </div>
+                    </>
+                  )}
+
+                  {customerType === 'private' && (
+                    <div className="mb-3"><label className={lc}>Codice Fiscale</label><input type="text" value={billing.codice_fiscale} onChange={e => updateBilling('codice_fiscale', e.target.value)} className={ic} placeholder="Opzionale" /></div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className={lc}>Nome *</label><input type="text" value={billing.first_name} onChange={e => updateBilling('first_name', e.target.value)} className={ic} required /></div>
                     <div><label className={lc}>Cognome *</label><input type="text" value={billing.last_name} onChange={e => updateBilling('last_name', e.target.value)} className={ic} required /></div>
@@ -195,9 +291,7 @@ export default function CartDrawer({ base = '' }: { base?: string }) {
                     <div><label className={lc}>Email *</label><input type="email" value={billing.email} onChange={e => updateBilling('email', e.target.value)} className={ic} required /></div>
                     <div><label className={lc}>Telefono *</label><input type="tel" value={billing.phone} onChange={e => updateBilling('phone', e.target.value)} className={ic} required /></div>
                   </div>
-                  <div className="mt-3"><label className={lc}>Azienda</label><input type="text" value={billing.company} onChange={e => updateBilling('company', e.target.value)} className={ic} /></div>
-                  <div className="mt-3"><label className={lc}>Codice Fiscale / P.IVA</label><input type="text" value={billing.codice_fiscale} onChange={e => updateBilling('codice_fiscale', e.target.value)} className={ic} /></div>
-                  <div className="mt-3"><label className={lc}>Indirizzo *</label><input type="text" value={billing.address_1} onChange={e => updateBilling('address_1', e.target.value)} className={ic} required /></div>
+                  <div className="mt-3"><label className={lc}>Indirizzo *</label><input type="text" value={billing.address_1} onChange={e => updateBilling('address_1', e.target.value)} className={ic} placeholder="Via Roma 1" required /></div>
                   <div className="grid grid-cols-3 gap-3 mt-3">
                     <div><label className={lc}>Città *</label><input type="text" value={billing.city} onChange={e => updateBilling('city', e.target.value)} className={ic} required /></div>
                     <div><label className={lc}>CAP *</label><input type="text" value={billing.postcode} onChange={e => updateBilling('postcode', e.target.value.replace(/\D/g, '').slice(0, 5))} className={ic} maxLength={5} required /></div>
@@ -215,6 +309,9 @@ export default function CartDrawer({ base = '' }: { base?: string }) {
                   <h3 className="font-heading font-bold text-brown mb-3">Spedizione</h3>
                   {subtotal < freeThreshold && (
                     <p className="text-xs text-muted mb-3">Ti mancano {fmt(freeThreshold - subtotal)} per la spedizione gratuita</p>
+                  )}
+                  {subtotal >= freeThreshold && (
+                    <p className="text-xs text-green-600 font-medium mb-3">✓ Spedizione gratuita!</p>
                   )}
                   <label className="flex items-center gap-2 cursor-pointer text-sm">
                     <input type="checkbox" checked={shipToDifferent} onChange={e => setShipToDifferent(e.target.checked)} className="rounded border-gray-300 text-amber focus:ring-amber" />
@@ -257,8 +354,8 @@ export default function CartDrawer({ base = '' }: { base?: string }) {
             {view === 'processing' && (
               <div className="text-center py-20 px-4">
                 <div className="w-12 h-12 border-4 border-amber border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="font-heading text-brown text-lg">Preparazione ordine...</p>
-                <p className="text-muted text-sm mt-1">Verrai reindirizzato al pagamento</p>
+                <p className="font-heading text-brown text-lg">Creazione ordine...</p>
+                <p className="text-muted text-sm mt-1">Verrai reindirizzato al pagamento sicuro</p>
               </div>
             )}
           </div>
