@@ -5,7 +5,8 @@
       "name": "pastapanarese-astro",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 4328
+      "port": 4329,
+      "cwd": "/Users/davidefilippini/Documents/Claude/pastapanarese-astro"
     }
   ]
 }

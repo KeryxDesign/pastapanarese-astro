@@ -15,12 +15,23 @@ const product = products[0];
 
 if (!product) return Astro.redirect(url('/prodotti'));
 
-// Fetch related products
-const relatedIds = [...(product.related_ids ?? []), ...(product.cross_sell_ids ?? [])].slice(0, 4);
-const related = relatedIds.length > 0
-  ? await Promise.all(relatedIds.map(id => getProductById(id).catch(() => null)))
+// Fetch upsell products (pacchi risparmio dello stesso prodotto)
+const upsellIds = (product.upsell_ids ?? []).slice(0, 4);
+const upsells = upsellIds.length > 0
+  ? (await Promise.all(upsellIds.map(id => getProductById(id).catch(() => null)))).filter(Boolean)
   : [];
-const relatedProducts = related.filter(Boolean);
+
+// Fetch cross-sell products (sughi e complementari)
+const crossSellIds = (product.cross_sell_ids ?? []).slice(0, 4);
+const crossSells = crossSellIds.length > 0
+  ? (await Promise.all(crossSellIds.map(id => getProductById(id).catch(() => null)))).filter(Boolean)
+  : [];
+
+// Fetch related products (same category)
+const relatedIds = (product.related_ids ?? []).filter(id => !upsellIds.includes(id) && !crossSellIds.includes(id)).slice(0, 4);
+const related = relatedIds.length > 0
+  ? (await Promise.all(relatedIds.map(id => getProductById(id).catch(() => null)))).filter(Boolean)
+  : [];
 
 const mainImage = product.images[0];
 const galleryImages = product.images.slice(1);
@@ -150,34 +161,79 @@ function stripHtml(html: string) {
       </div>
     )}
 
-    <!-- Prodotti correlati -->
-    {relatedProducts.length > 0 && (
-      <div>
-        <h2 class="font-heading text-3xl font-bold text-earth mb-8">Potrebbe interessarti</h2>
+    <!-- Upsell: Pacchi risparmio -->
+    {upsells.length > 0 && (
+      <div class="bg-amber/10 rounded-2xl p-8 mb-10">
+        <h2 class="font-heading text-2xl font-bold text-earth mb-6">💰 Risparmia con il pacco</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {upsells.map((rel) => rel && (
+            <a
+              href={url(`/prodotti/${rel.slug}`)}
+              class="group flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-cream">
+                {rel.images[0] ? (
+                  <img src={rel.images[0].src} alt={rel.images[0].alt || rel.name} class="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center text-muted text-2xl">Pasta</div>
+                )}
+              </div>
+              <div class="flex-1">
+                <h3 class="font-semibold text-sm text-earth leading-tight mb-1 group-hover:text-amber transition-colors">{rel.name}</h3>
+                <span class="text-amber font-bold">{formatPrice(rel.price)}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Cross-sell: Abbinamenti consigliati -->
+    {crossSells.length > 0 && (
+      <div class="mb-10">
+        <h2 class="font-heading text-2xl font-bold text-earth mb-6">Abbina con</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {relatedProducts.map((rel) => rel && (
+          {crossSells.map((rel) => rel && (
             <a
               href={url(`/prodotti/${rel.slug}`)}
               class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
               <div class="aspect-square overflow-hidden bg-cream">
                 {rel.images[0] ? (
-                  <img
-                    src={rel.images[0].src}
-                    alt={rel.images[0].alt || rel.name}
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
+                  <img src={rel.images[0].src} alt={rel.images[0].alt || rel.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                 ) : (
-                  <div class="w-full h-full flex items-center justify-center text-muted text-4xl">
-                    Pasta
-                  </div>
+                  <div class="w-full h-full flex items-center justify-center text-muted text-4xl">Pasta</div>
                 )}
               </div>
               <div class="p-4">
-                <h3 class="font-semibold text-sm text-earth leading-tight mb-2 group-hover:text-amber transition-colors">
-                  {rel.name}
-                </h3>
+                <h3 class="font-semibold text-sm text-earth leading-tight mb-2 group-hover:text-amber transition-colors">{rel.name}</h3>
+                <span class="text-amber font-bold text-sm">{formatPrice(rel.price)}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Prodotti correlati -->
+    {related.length > 0 && (
+      <div>
+        <h2 class="font-heading text-2xl font-bold text-earth mb-6">Potrebbe interessarti</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {related.map((rel) => rel && (
+            <a
+              href={url(`/prodotti/${rel.slug}`)}
+              class="group bg-white rounded-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="aspect-square overflow-hidden bg-cream">
+                {rel.images[0] ? (
+                  <img src={rel.images[0].src} alt={rel.images[0].alt || rel.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center text-muted text-4xl">Pasta</div>
+                )}
+              </div>
+              <div class="p-4">
+                <h3 class="font-semibold text-sm text-earth leading-tight mb-2 group-hover:text-amber transition-colors">{rel.name}</h3>
                 <span class="text-amber font-bold text-sm">{formatPrice(rel.price)}</span>
               </div>
             </a>

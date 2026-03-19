@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getItems, onCartChange } from '../stores/cart';
 
-export default function CartIcon({ base = '' }: { base?: string }) {
+export default function CartIcon() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -9,8 +9,16 @@ export default function CartIcon({ base = '' }: { base?: string }) {
     return onCartChange(items => setCount(items.reduce((s, i) => s + i.quantity, 0)));
   }, []);
 
+  function openCart() {
+    window.dispatchEvent(new CustomEvent('pp-cart-open'));
+  }
+
   return (
-    <a href={`${base}/carrello`} className="relative flex items-center gap-1 text-brown hover:text-amber transition-colors">
+    <button
+      onClick={openCart}
+      className="relative flex items-center gap-1 text-brown hover:text-amber transition-colors"
+      aria-label="Carrello"
+    >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="9" cy="21" r="1"/>
         <circle cx="20" cy="21" r="1"/>
@@ -21,6 +29,6 @@ export default function CartIcon({ base = '' }: { base?: string }) {
           {count}
         </span>
       )}
-    </a>
+    </button>
   );
 }

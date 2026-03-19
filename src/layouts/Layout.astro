@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import CartIcon from '@/components/CartIcon';
+import CartDrawer from '@/components/CartDrawer';
 import { url } from '@/lib/utils';
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
 const { title = 'Pasta Panarese', description = 'Pasta Panarese: Eccellenza della Pasta Italiana dalla Val d\'Orcia' } = Astro.props;
 
 const navLinks = [
-  { href: '/prodotti', label: 'Shop' },
+  { href: '/', label: 'Shop' },
 ];
 ---
 
@@ -64,7 +65,7 @@ const navLinks = [
 
       <!-- Cart + Mobile menu -->
       <div class="flex items-center gap-3">
-        <CartIcon client:load base={import.meta.env.BASE_URL.replace(/\/?$/, '')} />
+        <CartIcon client:load />
         <button id="menu-btn" class="lg:hidden p-2 text-brown hover:text-brown-dark" aria-label="Menu">
           <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -82,6 +83,8 @@ const navLinks = [
       ))}
     </div>
   </header>
+
+  <CartDrawer client:load base={import.meta.env.BASE_URL.replace(/\/?$/, '')} />
 
   <main class="flex-1">
     <slot />
@@ -108,7 +111,7 @@ const navLinks = [
       <div>
         <h4 class="font-heading font-bold text-amber mb-4">Esplora</h4>
         <ul class="space-y-2 text-white/70 text-sm">
-          <li><a href={url('/prodotti')} class="hover:text-amber transition-colors">Shop</a></li>
+          <li><a href={url('/')} class="hover:text-amber transition-colors">Shop</a></li>
         </ul>
       </div>
 
